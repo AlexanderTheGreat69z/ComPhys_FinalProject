@@ -16,17 +16,18 @@ class __RectObject:
         self.surface.blit(self.text, self.text_rect)
         
 class Tube(__RectObject):
-    def __init__(self, surface:pygame.Surface, a:int):
+    def __init__(self, surface:pygame.Surface, w:int, h:int):
         self.surface = surface
-        super().__init__(self.surface, (0,0,self.surface.get_width(), a), (200,200,200))
-        self.backborder = pygame.Rect(0, 0, self.rect.width, a+10)
+        self.tube_col = (200,210,220)
+        super().__init__(self.surface, (0,0, w, h), self.tube_col)
+        self.backborder = pygame.Rect(0, 0, self.rect.width, h+10)
         
-        self.bb_color = (150,150,150)
-        self.rect.center = self.surface.get_rect().center
+        self.bb_col = (150,150,150)
+        self.rect.centery = self.surface.get_rect().centery
     
     def draw(self):
         self.backborder.center = self.rect.center
-        pygame.draw.rect(self.surface, self.bb_color, self.backborder)
+        pygame.draw.rect(self.surface, self.bb_col, self.backborder)
         pygame.draw.rect(self.surface, self.color, self.rect)
         
 class Particle(__RectObject):
@@ -40,7 +41,7 @@ class Particle(__RectObject):
         pygame.draw.circle(self.surface, self.outline, self.rect.center, self.size//2, self.size // 5)
         
 class ParticleColumn:
-    def __init__(self, surface:pygame.Surface, s, n, generation_range:tuple = None):
+    def __init__(self, surface:pygame.Surface, s, n, v, generation_range:tuple = None):
         self.surface = surface
         self.particle_size = s
         self.rect = pygame.Rect(0,0,s,self.surface.get_height())
@@ -50,6 +51,8 @@ class ParticleColumn:
         self.num_of_particles = n
         self.particles = []
         self.__generateParticles()
+        
+        self.travel_speed = v
     
     def __generateParticles(self):
         for i in range(self.num_of_particles):
@@ -63,4 +66,23 @@ class ParticleColumn:
         for p in self.particles: 
             p.rect.centerx = self.rect.centerx
             p.draw()
-        pygame.draw.line(self.surface, (255,0,0), (self.rect.centerx, 0), (self.rect.centerx, self.surface.get_height()))
+        self.rect.x += self.travel_speed
+        # pygame.draw.line(self.surface, (255,0,0), (self.rect.centerx, 0), (self.rect.centerx, self.surface.get_height()))
+
+class Timer:
+    def __init__(self, t:int, loop:bool=False):
+        self.interval = t * 1000
+        self.start = pygame.time.get_ticks()
+        self.loop = loop
+        self.__triggered = False
+        
+    def countdown(self):
+        current = pygame.time.get_ticks()
+        if current - self.start >= self.interval:
+            self.__triggered = True
+            if self.loop: self.start = current  # Reset the timer
+        else:
+            self.__triggered = False
+    
+    def triggered(self):
+        return self.__triggered
