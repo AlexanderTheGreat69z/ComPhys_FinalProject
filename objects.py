@@ -1,5 +1,6 @@
 import pygame
 from random import randint
+from settings import *
 
 class __RectObject:
     def __init__(self, surface:pygame.Surface, rect_val:tuple, color:tuple = (0,0,0), text:str = None):
@@ -18,11 +19,11 @@ class __RectObject:
 class Tube(__RectObject):
     def __init__(self, surface:pygame.Surface, w:int, h:int):
         self.surface = surface
-        self.tube_col = (200,210,220)
+        self.tube_col = TUBE_BG_COLOR
         super().__init__(self.surface, (0,0, w, h), self.tube_col)
         self.backborder = pygame.Rect(0, 0, self.rect.width, h+10)
         
-        self.bb_col = (150,150,150)
+        self.bb_col = TUBE_BORDER_COLOR
         self.rect.centery = self.surface.get_rect().centery
     
     def draw(self):
@@ -33,8 +34,8 @@ class Tube(__RectObject):
 class Particle(__RectObject):
     def __init__(self, surface, size):
         self.size = size
-        self.outline = (0,150, 200)
-        super().__init__(surface, (0,0,size,size), (0,200,200))
+        self.outline = PARTICLE_OUTLINE_COLOR
+        super().__init__(surface, (0,0,size,size), PARTICLE_COLOR)
     
     def draw(self):
         pygame.draw.circle(self.surface, self.color, self.rect.center, self.size//2)
@@ -48,7 +49,7 @@ class ParticleColumn:
         
         self.min_range, self.max_range = generation_range
         
-        self.num_of_particles = n
+        self.num_of_particles = round(n)
         self.particles = []
         self.__generateParticles()
         
